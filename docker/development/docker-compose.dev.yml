@@ -1,0 +1,36 @@
+version: "3.4"
+services:
+    dev-api:
+        container_name: drizzle-dev-api
+        build:
+            context: ../../
+            dockerfile: docker/development/Dockerfile
+            target: development
+        volumes:
+            - ../../:/app
+            - /app/node_modules
+        ports:
+            - 4040:4040
+        # To run the migration server, uncomment line 15 and comment line 16
+        # command: yarn migration:server # runs migration server
+        command: yarn dev
+        depends_on:
+            - dev-db
+        env_file:
+            - ../../.env.development
+
+    dev-db:
+        image: postgres:14
+        restart: always
+        container_name: drizzle-dev-db
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_USER=drizzle
+            - POSTGRES_PASSWORD=drizzle
+            - POSTGRES_DB=d-dev-db
+        volumes:
+            - d-db:/var/lib/postgresql/data
+
+volumes:
+    drizzle-db: {}
